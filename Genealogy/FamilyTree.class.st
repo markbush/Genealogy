@@ -59,6 +59,21 @@ FamilyTree class >> getGoogleProfileFromToken: token [
 	^ WAJsonParser parse: request get
 ]
 
+{ #category : #defaults }
+FamilyTree class >> getUserForCode: code [
+	| tokenRequest tokenResponse accessToken refreshToken idToken userDict user |
+	tokenRequest := self tokenRequestForCode: code.
+	tokenResponse := WAJsonParser parse: tokenRequest post.
+	accessToken := (tokenResponse at: 'access_token' ifAbsent: [ nil ]).
+	refreshToken := (tokenResponse at: 'refresh_token' ifAbsent: [ nil ]).
+	idToken := (tokenResponse at: 'id_token' ifAbsent: [ nil ]).
+	userDict := self getGoogleProfileFromToken: accessToken.
+	(userDict includesKey: 'error') ifTrue: [ userDict inspect. ^ nil ].
+	user := FamilyTreeUser fromGoogleUserInfo: userDict.
+	user accessToken: accessToken; refreshToken: refreshToken; idToken: idToken.
+	^ user
+]
+
 { #category : #'class initialization' }
 FamilyTree class >> initialize [
 	"self initialize"
@@ -83,9 +98,24 @@ FamilyTree class >> tokenRequestForCode: code [
 	^ request
 ]
 
-{ #category : #logout }
+{ #category : #testing }
+FamilyTree >> isLoggedIn [
+	^ self session isLoggedIn
+]
+
+{ #category : #login }
 FamilyTree >> login [
 	^ self redirect
+]
+
+{ #category : #login }
+FamilyTree >> login: aUser [
+	self session login: aUser
+]
+
+{ #category : #accessing }
+FamilyTree >> loginUser [
+	^ self session user
 ]
 
 { #category : #logout }
@@ -94,35 +124,30 @@ FamilyTree >> logout [
 ]
 
 { #category : #login }
-FamilyTree >> performLogin [
-	| code tokenRequest tokenResponse accessToken refreshToken idToken user |
+FamilyTree >> performLoginOn: html [
+	| code user |
 	code := self requestContext request queryFields at: 'code' ifAbsent: [ nil ].
 	code ifNil: [ ^ self ].
-	tokenRequest := self class tokenRequestForCode: code.
-	tokenResponse := WAJsonParser parse: tokenRequest post.
-	accessToken := (tokenResponse at: 'access_token' ifAbsent: [ nil ]).
-	refreshToken := (tokenResponse at: 'refresh_token' ifAbsent: [ nil ]).
-	idToken := (tokenResponse at: 'id_token' ifAbsent: [ nil ]).
-	user := self class getGoogleProfileFromToken: accessToken.
-	(user includesKey: 'error') ifTrue: [ ^ self ].
-	self session accessToken: accessToken.
-	self session refreshToken: refreshToken.
-	self session idToken: idToken.
-	self session login: user
+	user := self class getUserForCode: code.
+	user ifNotNil: [
+		self login: user.
+		"Redirect to preserve the session and remove Google login parameters."
+		self requestContext responseGenerator redirectTo: html anchor url; respond
+	]
 ]
 
 { #category : #login }
 FamilyTree >> redirect [
-	^ self requestContext responseGenerator
-		redirectTo: self class defaultRedirectUrl;
-		respond
+	| url |
+	url := self class defaultRedirectUrl.
+	^ self requestContext responseGenerator redirectTo: url; respond
 ]
 
 { #category : #rendering }
 FamilyTree >> renderContentOn: html [
-	self performLogin.
+	self isLoggedIn ifFalse: [ self performLoginOn: html ].
 	html heading: 'Family Tree'.
-	self session isLoggedIn
+	self isLoggedIn
 		ifTrue: [ self renderLoggedInViewOn: html ]
 		ifFalse: [ self renderLoggedOutViewOn: html ]
 ]
@@ -130,8 +155,8 @@ FamilyTree >> renderContentOn: html [
 { #category : #rendering }
 FamilyTree >> renderLoggedInViewOn: html [
 	| image |
-	html heading level: 3; with: 'Logged in'.
-	image := self session user at: 'picture' ifAbsent: [ nil ].
+	html heading level: 3; with: 'Logged in as ' , self loginUser name.
+	image := self loginUser picture.
 	image ifNotNil: [
 		html image url: image
 	].

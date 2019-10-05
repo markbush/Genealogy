@@ -7,33 +7,10 @@ Class {
 	#name : #FamilyTreeSession,
 	#superclass : #WASession,
 	#instVars : [
-		'user',
-		'accessToken',
-		'refreshToken',
-		'idToken'
+		'user'
 	],
 	#category : #Genealogy
 }
-
-{ #category : #accessing }
-FamilyTreeSession >> accessToken [
-	^ accessToken
-]
-
-{ #category : #accessing }
-FamilyTreeSession >> accessToken: aToken [
-	accessToken := aToken
-]
-
-{ #category : #accessing }
-FamilyTreeSession >> idToken [
-	^ idToken
-]
-
-{ #category : #accessing }
-FamilyTreeSession >> idToken: aToken [
-	idToken := aToken
-]
 
 { #category : #testing }
 FamilyTreeSession >> isLoggedIn [
@@ -47,20 +24,7 @@ FamilyTreeSession >> login: aUser [
 
 { #category : #operations }
 FamilyTreeSession >> logout [
-	user := nil.
-	accessToken := nil.
-	idToken := nil.
-	refreshToken := nil
-]
-
-{ #category : #accessing }
-FamilyTreeSession >> refreshToken [
-	^ refreshToken
-]
-
-{ #category : #accessing }
-FamilyTreeSession >> refreshToken: aToken [
-	refreshToken := aToken
+	user := nil
 ]
 
 { #category : #'parent/child' }
