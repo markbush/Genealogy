@@ -132,7 +132,7 @@ FamilyTree >> performLoginOn: html [
 	user ifNotNil: [
 		self login: user.
 		"Redirect to preserve the session and remove Google login parameters."
-		self requestContext responseGenerator redirectTo: html anchor url; respond
+		self requestContext responseGenerator redirectTo: html actionUrl; respond
 	]
 ]
 
@@ -146,37 +146,137 @@ FamilyTree >> redirect [
 { #category : #rendering }
 FamilyTree >> renderContentOn: html [
 	self isLoggedIn ifFalse: [ self performLoginOn: html ].
-	html heading: 'Family Tree'.
+	self renderNavbarOn: html.
 	self isLoggedIn
 		ifTrue: [ self renderLoggedInViewOn: html ]
 		ifFalse: [ self renderLoggedOutViewOn: html ]
 ]
 
 { #category : #rendering }
-FamilyTree >> renderLoggedInViewOn: html [
-	| image |
-	html heading level: 3; with: 'Logged in as ' , self loginUser name.
-	image := self loginUser picture.
-	image ifNotNil: [
-		html image url: image
-	].
-	html form: [
-		html submitButton
-			callback: [ self logout ];
-			with: 'Logout'
+FamilyTree >> renderLoggedInMainOn: html [
+	html tbsColumn
+		class: 'main';
+		mediumOffset: 3;
+		mediumSize: 9;
+		with: [
+			html unorderedList: [
+				40 timesRepeat: [
+					html listItem: 'main stuff'
+				]
+			]
+		]
+]
+
+{ #category : #rendering }
+FamilyTree >> renderLoggedInNavbarOn: html [
+	html form
+		tbsPullLeft;
+		with: [
+			html tbsNavbarButton
+				callback: [ self logout ];
+				with: 'Logout'
+		].
+	html tbsNavbarText tbsPullRight with: [
+		html text: 'Logged in as ' , self loginUser name.
+		self loginUser picture
+			ifNotNil: [ html image url: self loginUser picture ]
 	]
 ]
 
 { #category : #rendering }
+FamilyTree >> renderLoggedInSidebarOn: html [
+	html tbsColumn
+		class: 'sidebar';
+		mediumSize: 3;
+		with: [
+			html unorderedList: [
+				50 timesRepeat: [
+					html listItem: 'an item'
+				]
+			]
+		]
+]
+
+{ #category : #rendering }
+FamilyTree >> renderLoggedInViewOn: html [
+	html div
+		class: 'container-fluid';
+		with: [
+			html tbsRow
+				with: [
+					self renderLoggedInSidebarOn: html.
+					self renderLoggedInMainOn: html
+				]
+		]
+]
+
+{ #category : #rendering }
+FamilyTree >> renderLoggedOutNavbarOn: html [
+	html form
+		tbsPullLeft;
+		with: [
+			html tbsNavbarButton
+				callback: [ self login ];
+				with: 'Login with Google'
+		]
+]
+
+{ #category : #rendering }
 FamilyTree >> renderLoggedOutViewOn: html [
-	html form: [
-		html submitButton
-			callback: [ self login ];
-			with: 'Login with Google'
-	]
+	html heading level: 3; with: 'You need to log in to use this app'
+]
+
+{ #category : #rendering }
+FamilyTree >> renderNavbarOn: html [
+	html tbsNavbar
+		beDefault;
+		class: 'navbar-fixed-top';
+		with: [
+			html tbsNavbarBrand
+				url: html actionUrl;
+				with: 'Bush Family Tree'.
+			self isLoggedIn
+				ifTrue: [ self renderLoggedInNavbarOn: html ]
+				ifFalse: [ self renderLoggedOutNavbarOn: html ]
+		]
+]
+
+{ #category : #hooks }
+FamilyTree >> style [
+	^ '
+body {
+	height: 100%;
+	padding-top: 71px;
+}
+.navbar img {
+	height: 40px;
+	margin-left: 10px;
+	border-radius: 50%;
+}
+.sidebar {
+	position: fixed;
+	top: 71px;
+	bottom:25px;
+	left: 0;
+	z-index: 1000;
+	display: block;
+	padding: 20px;
+	overflow-x: hidden;
+	overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+	background-color: #f5f5f5;
+	border-right: 1px solid #eee;
+}
+.sidebar li {
+	position: relative;
+	display: block;
+}
+.main {
+}
+'
 ]
 
 { #category : #updating }
 FamilyTree >> updateRoot: htmlRoot [
+	super updateRoot: htmlRoot.
 	htmlRoot title: 'Family Tree'
 ]
