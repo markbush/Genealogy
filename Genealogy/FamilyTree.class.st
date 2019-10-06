@@ -282,6 +282,8 @@ body {
 }
 .person-compact {
 	border-bottom: 1px solid #eee;
+}
+.selectable {
 	cursor: pointer;
 }
 .person-name {

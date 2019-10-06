@@ -5,7 +5,7 @@ Class {
 	#name : #FamilyTreeCompactPersonView,
 	#superclass : #WAComponent,
 	#instVars : [
-		'parent',
+		'parentView',
 		'person'
 	],
 	#category : #Genealogy
@@ -13,17 +13,17 @@ Class {
 
 { #category : #'instance creation' }
 FamilyTreeCompactPersonView class >> on: aPerson for: aView [
-	^ self new person: aPerson; parent: aView
+	^ self new person: aPerson; parentView: aView
 ]
 
 { #category : #accessing }
-FamilyTreeCompactPersonView >> parent [
-	^ parent
+FamilyTreeCompactPersonView >> parentView [
+	^ parentView
 ]
 
 { #category : #accessing }
-FamilyTreeCompactPersonView >> parent: aView [
-	parent := aView
+FamilyTreeCompactPersonView >> parentView: aView [
+	parentView := aView
 ]
 
 { #category : #accessing }
@@ -54,12 +54,12 @@ FamilyTreeCompactPersonView >> renderBirthOn: html [
 { #category : #rendering }
 FamilyTreeCompactPersonView >> renderContentOn: html [
 	html div
-		class: 'person-compact';
+		class: 'person-compact selectable';
 		onClick: (
 			((html jQuery id: #main) load)
 				html: [ :ajaxHtml |
-					self parent selectedPerson: self person.
-					self parent renderPersonOn: ajaxHtml
+					self parentView selectedPerson: self person.
+					self parentView renderPersonOn: ajaxHtml
 				]
 		);
 		with: [
