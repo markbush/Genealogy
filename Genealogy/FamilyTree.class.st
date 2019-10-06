@@ -5,10 +5,12 @@ Class {
 	#name : #FamilyTree,
 	#superclass : #WAComponent,
 	#instVars : [
-		'selectedPerson'
+		'selectedPerson',
+		'selectedView'
 	],
 	#classInstVars : [
-		'credentials'
+		'credentials',
+		'validUsers'
 	],
 	#category : #Genealogy
 }
@@ -54,6 +56,11 @@ FamilyTree class >> defaultScopes [
 ]
 
 { #category : #defaults }
+FamilyTree class >> defaultUsers [
+	^ #('mark@bushnet.org')
+]
+
+{ #category : #defaults }
 FamilyTree class >> getGoogleProfileFromToken: token [
 	| url request |
 	url := 'https://www.googleapis.com/oauth2/v1/userinfo'.
@@ -71,8 +78,10 @@ FamilyTree class >> getUserForCode: code [
 	refreshToken := (tokenResponse at: 'refresh_token' ifAbsent: [ nil ]).
 	idToken := (tokenResponse at: 'id_token' ifAbsent: [ nil ]).
 	userDict := self getGoogleProfileFromToken: accessToken.
-	(userDict includesKey: 'error') ifTrue: [ userDict inspect. ^ nil ].
+	(userDict includesKey: 'error') ifTrue: [ ^ nil ].
 	user := FamilyTreeUser fromGoogleUserInfo: userDict.
+	(self validUsers includes: user email)
+		ifFalse: [ ^ nil ].
 	user accessToken: accessToken; refreshToken: refreshToken; idToken: idToken.
 	^ user
 ]
@@ -80,6 +89,7 @@ FamilyTree class >> getUserForCode: code [
 { #category : #'class initialization' }
 FamilyTree class >> initialize [
 	"self initialize"
+	validUsers := self defaultUsers.
 	(WAAdmin register: self asApplicationAt: 'family')
 		preferenceAt: #sessionClass put: FamilyTreeSession;
 		addLibrary: JQDeploymentLibrary;
@@ -99,6 +109,11 @@ FamilyTree class >> tokenRequestForCode: code [
 	query at: 'grant_type' put: 'authorization_code'.
 	request formAddAll: query.
 	^ request
+]
+
+{ #category : #accessing }
+FamilyTree class >> validUsers [
+	^ validUsers ifNil: [ validUsers := self defaultUsers ]
 ]
 
 { #category : #testing }
@@ -204,7 +219,11 @@ FamilyTree >> renderLoggedInViewOn: html [
 		with: [
 			html tbsRow
 				with: [
-					self renderLoggedInSidebarOn: html.
+					html div
+						id: #sidebar;
+						with: [
+							self renderLoggedInSidebarOn: html.
+						].
 					self renderLoggedInMainOn: html
 				]
 		]
@@ -243,7 +262,7 @@ FamilyTree >> renderNavbarOn: html [
 
 { #category : #rendering }
 FamilyTree >> renderPersonOn: html [
-	html render: (FamilyTreePersonView on: self selectedPerson for: self)
+	html render: (FamilyTreePersonView on: self selectedPerson for: self selectedView: self selectedView)
 ]
 
 { #category : #accessing }
@@ -254,6 +273,16 @@ FamilyTree >> selectedPerson [
 { #category : #accessing }
 FamilyTree >> selectedPerson: aPerson [
 	selectedPerson := aPerson
+]
+
+{ #category : #accessing }
+FamilyTree >> selectedView [
+	^ selectedView
+]
+
+{ #category : #accessing }
+FamilyTree >> selectedView: aView [
+	selectedView := aView
 ]
 
 { #category : #hooks }

@@ -6,7 +6,8 @@ Class {
 	#superclass : #WAComponent,
 	#instVars : [
 		'parentView',
-		'person'
+		'person',
+		'viewId'
 	],
 	#category : #Genealogy
 }
@@ -53,18 +54,11 @@ FamilyTreeCompactPersonView >> renderBirthOn: html [
 
 { #category : #rendering }
 FamilyTreeCompactPersonView >> renderContentOn: html [
+	self viewId: html nextId.
 	html div
-		class: 'person-compact selectable';
-		onClick: (
-			((html jQuery id: #main) load)
-				html: [ :ajaxHtml |
-					self parentView selectedPerson: self person.
-					self parentView renderPersonOn: ajaxHtml
-				]
-		);
+		id: self viewId;
 		with: [
-			self renderNameOn: html.
-			self renderDatesOn: html
+			self renderPersonOn: html
 		]
 ]
 
@@ -99,4 +93,32 @@ FamilyTreeCompactPersonView >> renderNameOn: html [
 				mediumSize: 10;
 				with: self person fullName
 		]
+]
+
+{ #category : #rendering }
+FamilyTreeCompactPersonView >> renderPersonOn: html [
+	html div
+		class: 'person-compact selectable';
+		onClick: (
+			((html jQuery id: #main) load)
+				html: [ :ajaxHtml |
+					self parentView selectedPerson: self person.
+					self parentView selectedView: self.
+					self parentView renderPersonOn: ajaxHtml
+				]
+		);
+		with: [
+			self renderNameOn: html.
+			self renderDatesOn: html
+		]
+]
+
+{ #category : #accessing }
+FamilyTreeCompactPersonView >> viewId [
+	^ viewId
+]
+
+{ #category : #accessing }
+FamilyTreeCompactPersonView >> viewId: anId [
+	viewId := anId
 ]
