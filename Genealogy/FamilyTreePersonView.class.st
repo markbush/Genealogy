@@ -14,9 +14,19 @@ Class {
 	#category : #Genealogy
 }
 
+{ #category : #defaults }
+FamilyTreePersonView class >> defaultGenders [
+	^ #('male' 'female' 'unknown' 'non binary' 'other')
+]
+
 { #category : #'instance creation' }
 FamilyTreePersonView class >> on: aPerson for: aView selectedView: aSelectedView [
 	^ self new person: aPerson; parentView: aView; selectedView: aSelectedView
+]
+
+{ #category : #defaults }
+FamilyTreePersonView class >> valueForGender: aGender [
+	^ self defaultGenders indexOf: aGender
 ]
 
 { #category : #accessing }
@@ -97,6 +107,95 @@ FamilyTreePersonView >> renderDatesForPerson: aPerson on: html [
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderGenderEditorOn: html [
+	html tbsModal id: #genderEditorModal; with: [  
+		html tbsModalDialog: [
+			html tbsModalContent: [ 
+				html tbsModalHeader: [ 
+					html tbsModalCloseIcon.
+					html tbsModalTitle
+						id: #genderEditorTitle;
+						level: 4;
+						with: 'Editor'				
+				 ].
+				html tbsModalBody: [
+					html div
+						id: #genderEditorForm;
+						with: [
+							self renderGenderFormOn: html
+						]
+				].
+				html tbsModalFooter: [ 
+					html tbsButton
+						attributeAt: 'data-dismiss' put: 'modal';
+						with: 'Close'.
+					html tbsButton
+						bePrimary;
+						attributeAt: 'data-dismiss' put: 'modal';
+						onClick: (
+							((html jQuery id: #main) load)
+								html: [ :ajaxHtml |
+									self updatePerson.
+									self parentView renderPersonOn: ajaxHtml
+								]
+						);
+						onClick: (
+							((html jQuery id: self selectedView viewId) load)
+								html: [ :ajaxHtml |
+									self selectedView renderPersonOn: ajaxHtml
+								]
+						);
+						with: 'Save' 	
+				 ]
+			]
+		]	
+	]
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderGenderFormOn: html [
+	html form
+		with: [
+			html select
+				id: #genderEditorText;
+				list: self class defaultGenders;
+				onChange: (
+					((html jQuery id: #genderEditorForm) load)
+						serializeForm;
+						html: [ :ajaxHtml | self renderGenderFormOn: ajaxHtml ]
+				);
+				selected: self editValue;
+				callback: [ :newValue | self editValue: newValue ]
+		]
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderGenderOn: html [
+	html anchor
+		url: '#genderEditorModal';
+		attributeAt: 'data-toggle' put: 'modal';
+		onClick: (
+			(html jQuery id: #genderEditorTitle) load
+				html: [ :ajaxHtml |
+					self editField: #gender:.
+					self editValue: self person gender.
+					ajaxHtml text: 'Edit gender'
+				]
+		);
+		onClick: (
+			(html jQuery id: #genderEditorText) value: (self class valueForGender: self person gender)
+		);
+		onClick: (
+			(html jQuery id: #genderEditorModal)
+				toggle
+		);
+		with: [
+			html text: 'Gender: '.
+			html text: self person gender
+		]
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderGrandParentsOn: html [
 	html heading level: 3; with: 'Grandparents'.
 	self person grandParents do: [ :grandParent |
@@ -108,7 +207,8 @@ FamilyTreePersonView >> renderGrandParentsOn: html [
 FamilyTreePersonView >> renderMainInfoOn: html [
 	self renderPersonForenamesOn: html. html break.
 	self renderPersonSurnameOn: html. html break.
-	self renderPersonNicknameOn: html.
+	self renderPersonNicknameOn: html. html break.
+	self renderGenderOn: html.
 	self renderPersonBirthOn: html.
 	self renderPersonDeathOn: html
 ]
@@ -194,6 +294,7 @@ FamilyTreePersonView >> renderPersonNicknameOn: html [
 { #category : #rendering }
 FamilyTreePersonView >> renderPersonOn: html [
 	self renderTextEditorOn: html.
+	self renderGenderEditorOn: html.
 	html heading level: 3; with: self person fullName.
 	self renderMainInfoOn: html.
 	self renderGrandParentsOn: html.
@@ -243,11 +344,12 @@ FamilyTreePersonView >> renderRelationship: aFamily on: html [
 			with: [
 				html text: partner fullName.
 				self renderDatesForPerson: partner on: html
-			].
-		html heading level: 5; with: 'Children'.
-		partner children do: [ :child |
-			self renderCompactPerson: child on: html
-		]
+			]
+	].
+	aFamily children ifEmpty: [ ^ self ].
+	html heading level: 5; with: 'Children'.
+	aFamily children do: [ :child |
+		self renderCompactPerson: child on: html
 	]
 ]
 
