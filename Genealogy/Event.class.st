@@ -31,6 +31,13 @@ Event >> date: aDateString [
 ]
 
 { #category : #accessing }
+Event >> dateString [
+	^ date
+		ifNil: [ '' ]
+		ifNotNil: [ date ]
+]
+
+{ #category : #accessing }
 Event >> location [
 	^ location
 ]

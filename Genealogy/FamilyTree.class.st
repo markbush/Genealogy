@@ -4,6 +4,9 @@ I am a family tree application.
 Class {
 	#name : #FamilyTree,
 	#superclass : #WAComponent,
+	#instVars : [
+		'selectedPerson'
+	],
 	#classInstVars : [
 		'credentials'
 	],
@@ -155,15 +158,14 @@ FamilyTree >> renderContentOn: html [
 { #category : #rendering }
 FamilyTree >> renderLoggedInMainOn: html [
 	html tbsColumn
+		id: #main;
 		class: 'main';
 		mediumOffset: 3;
 		mediumSize: 9;
 		with: [
-			html unorderedList: [
-				40 timesRepeat: [
-					html listItem: 'main stuff'
-				]
-			]
+			self selectedPerson
+				ifNil: [ html text: 'No entry selected' ]
+				ifNotNil: [ self renderPersonOn: html ]
 		]
 ]
 
@@ -189,10 +191,8 @@ FamilyTree >> renderLoggedInSidebarOn: html [
 		class: 'sidebar';
 		mediumSize: 3;
 		with: [
-			html unorderedList: [
-				50 timesRepeat: [
-					html listItem: 'an item'
-				]
+			Person allPeople do: [ :person |
+					html render: (FamilyTreeCompactPersonView on: person for: self)
 			]
 		]
 ]
@@ -241,6 +241,21 @@ FamilyTree >> renderNavbarOn: html [
 		]
 ]
 
+{ #category : #rendering }
+FamilyTree >> renderPersonOn: html [
+	html render: (FamilyTreePersonView on: self selectedPerson for: self)
+]
+
+{ #category : #accessing }
+FamilyTree >> selectedPerson [
+	^ selectedPerson
+]
+
+{ #category : #accessing }
+FamilyTree >> selectedPerson: aPerson [
+	selectedPerson := aPerson
+]
+
 { #category : #hooks }
 FamilyTree >> style [
 	^ '
@@ -260,15 +275,18 @@ body {
 	left: 0;
 	z-index: 1000;
 	display: block;
-	padding: 20px;
 	overflow-x: hidden;
 	overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
 	background-color: #f5f5f5;
 	border-right: 1px solid #eee;
 }
-.sidebar li {
-	position: relative;
-	display: block;
+.person-compact {
+	border-bottom: 1px solid #eee;
+	cursor: pointer;
+}
+.person-name {
+	font-size: 120%;
+	font-weight: bold;
 }
 .main {
 }

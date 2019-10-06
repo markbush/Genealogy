@@ -23,6 +23,11 @@ Class {
 
 { #category : #accesing }
 Person class >> allPeople [
+	^ People values sorted: [ :a :b | a fullName <= b fullName ]
+]
+
+{ #category : #accesing }
+Person class >> allPeopleDict [
 	^ People
 ]
 
@@ -100,6 +105,13 @@ Person >> birth: anEvent [
 ]
 
 { #category : #accessing }
+Person >> birthString [
+	^ birth
+		ifNil: [ '' ]
+		ifNotNil: [ birth dateString ]
+]
+
+{ #category : #accessing }
 Person >> children [
 	^ self relationships flatCollect: [ :f | f children ]
 ]
@@ -152,6 +164,13 @@ Person >> death [
 { #category : #accessing }
 Person >> death: anEvent [
 	death := anEvent
+]
+
+{ #category : #accessing }
+Person >> deathString [
+	^ death
+		ifNil: [ '' ]
+		ifNotNil: [ death dateString ]
 ]
 
 { #category : #accessing }
