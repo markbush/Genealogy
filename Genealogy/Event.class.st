@@ -26,15 +26,29 @@ Event >> date [
 ]
 
 { #category : #accessing }
-Event >> date: aDateString [
-	date := aDateString
+Event >> date: anEventDate [
+	date := anEventDate
+]
+
+{ #category : #accessing }
+Event >> dateAndLocationString [
+	| s |
+	date ifNil: [ ^ '' ].
+	s := WriteStream on: String new.
+	s nextPutAll: date asString.
+	location ifNotNil: [
+		s nextPutAll: ' ('.
+		s nextPutAll: location.
+		s nextPutAll: ')'
+	].
+	^ s contents
 ]
 
 { #category : #accessing }
 Event >> dateString [
 	^ date
 		ifNil: [ '' ]
-		ifNotNil: [ date ]
+		ifNotNil: [ date asString ]
 ]
 
 { #category : #accessing }

@@ -222,12 +222,30 @@ FamilyTreePersonView >> renderParentsOn: html [
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderPartner: aPartner on: html [
+	html heading
+		level: 4;
+		class: 'selectable';
+		onClick: (
+			((html jQuery id: #main) load)
+				html: [ :ajaxHtml |
+					self parentView selectedPerson: aPartner.
+					self parentView renderPersonOn: ajaxHtml
+				]
+		);
+		with: [
+			html text: aPartner fullName.
+			self renderDatesForPerson: aPartner on: html
+		]
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderPersonBirthOn: html [
 	html heading
 		level: 5;
 		with: [
 			html text: 'Born: '.
-			html text: self person birthString
+			html text: self person birthWithLocationString
 		]
 ]
 
@@ -237,7 +255,7 @@ FamilyTreePersonView >> renderPersonDeathOn: html [
 		level: 5;
 		with: [
 			html text: 'Died: '.
-			html text: self person deathString
+			html text: self person deathWithLocationString
 		]
 ]
 
@@ -330,22 +348,7 @@ FamilyTreePersonView >> renderPersonSurnameOn: html [
 
 { #category : #rendering }
 FamilyTreePersonView >> renderRelationship: aFamily on: html [
-	aFamily partners reject: [ :p | p = self person ] thenDo: [ :partner |
-		html heading
-			level: 4;
-			class: 'selectable';
-			onClick: (
-				((html jQuery id: #main) load)
-					html: [ :ajaxHtml |
-						self parentView selectedPerson: partner.
-						self parentView renderPersonOn: ajaxHtml
-					]
-			);
-			with: [
-				html text: partner fullName.
-				self renderDatesForPerson: partner on: html
-			]
-	].
+	aFamily partners do: [ :partner | self renderPartner: partner on: html ] without: self person.
 	aFamily children ifEmpty: [ ^ self ].
 	html heading level: 5; with: 'Children'.
 	aFamily children do: [ :child |

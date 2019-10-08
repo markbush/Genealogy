@@ -112,6 +112,13 @@ Person >> birthString [
 ]
 
 { #category : #accessing }
+Person >> birthWithLocationString [
+	^ birth
+		ifNil: [ '' ]
+		ifNotNil: [ birth dateAndLocationString ]
+]
+
+{ #category : #accessing }
 Person >> children [
 	^ self relationships flatCollect: [ :f | f children ]
 ]
@@ -171,6 +178,13 @@ Person >> deathString [
 	^ death
 		ifNil: [ '' ]
 		ifNotNil: [ death dateString ]
+]
+
+{ #category : #accessing }
+Person >> deathWithLocationString [
+	^ death
+		ifNil: [ '' ]
+		ifNotNil: [ death dateAndLocationString ]
 ]
 
 { #category : #accessing }
