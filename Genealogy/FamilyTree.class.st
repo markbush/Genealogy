@@ -6,7 +6,8 @@ Class {
 	#superclass : #WAComponent,
 	#instVars : [
 		'selectedPerson',
-		'selectedView'
+		'selectedView',
+		'searchText'
 	],
 	#classInstVars : [
 		'credentials',
@@ -186,6 +187,28 @@ FamilyTree >> renderLoggedInMainOn: html [
 
 { #category : #rendering }
 FamilyTree >> renderLoggedInNavbarOn: html [
+	html tbsForm beInline tbsPullLeft with: [
+		html tbsInputGroup: [
+			html textInput 
+				tbsFormControl;
+				onChange: (
+					(html jQuery this) load
+						serializeForm
+				);
+				callback: [ :search | self searchText: search ];
+				value: self searchText;
+				placeholder: 'Search text'.
+			html tbsInputGroupAddOn
+				class: 'selectable';
+				onClick: (
+					((html jQuery id: #sidebar) load)
+						html: [ :ajaxHtml |
+							self renderLoggedInSidebarOn: ajaxHtml
+						]
+				);
+				with: [ html tbsGlyphIcon iconSearch ]
+		]
+	].
 	html form tbsPullRight with: [
 		html tbsNavbarButton
 			callback: [ self logout ];
@@ -201,12 +224,18 @@ FamilyTree >> renderLoggedInNavbarOn: html [
 
 { #category : #rendering }
 FamilyTree >> renderLoggedInSidebarOn: html [
+	| people |
+	people := Person allPeople.
+	self searchText isEmptyOrNil ifFalse: [ | regex |
+		regex := ('.*' , self searchText , '.*') asRegexIgnoringCase.
+		people := people select: [ :person | regex matches: person fullName ]
+	].
 	html tbsColumn
 		class: 'sidebar';
 		mediumSize: 3;
 		with: [
-			Person allPeople do: [ :person |
-					html render: (FamilyTreeCompactPersonView on: person for: self)
+			people do: [ :person |
+				html render: (FamilyTreeCompactPersonView on: person for: self)
 			]
 		]
 ]
@@ -265,6 +294,16 @@ FamilyTree >> renderPersonOn: html [
 ]
 
 { #category : #accessing }
+FamilyTree >> searchText [
+	^ searchText
+]
+
+{ #category : #accessing }
+FamilyTree >> searchText: aString [
+	searchText := aString
+]
+
+{ #category : #accessing }
 FamilyTree >> selectedPerson [
 	^ selectedPerson
 ]
@@ -291,6 +330,12 @@ body {
 	height: 100%;
 	padding-top: 71px;
 }
+.navbar .navbar-brand {
+	margin-top: 10px;
+}
+.navbar .form-inline {
+	margin-top: 15px;
+}
 .navbar img {
 	height: 40px;
 	margin-left: 10px;
@@ -300,9 +345,6 @@ body {
 .navbar .btn {
 	margin-top: 15px;
 	margin-right: 20px;
-}
-.navbar .navbar-brand {
-	margin-top: 10px;
 }
 .sidebar {
 	position: fixed;
