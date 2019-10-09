@@ -186,18 +186,17 @@ FamilyTree >> renderLoggedInMainOn: html [
 
 { #category : #rendering }
 FamilyTree >> renderLoggedInNavbarOn: html [
-	html form
-		tbsPullLeft;
-		with: [
-			html tbsNavbarButton
-				callback: [ self logout ];
-				with: 'Logout'
-		].
+	html form tbsPullRight with: [
+		html tbsNavbarButton
+			callback: [ self logout ];
+			with: 'Logout'
+	].
 	html tbsNavbarText tbsPullRight with: [
-		html text: 'Logged in as ' , self loginUser name.
 		self loginUser picture
-			ifNotNil: [ html image url: self loginUser picture ]
-	]
+			ifNotNil: [ html image url: self loginUser picture ].
+		html text: self loginUser name
+	].
+
 ]
 
 { #category : #rendering }
@@ -232,9 +231,9 @@ FamilyTree >> renderLoggedInViewOn: html [
 { #category : #rendering }
 FamilyTree >> renderLoggedOutNavbarOn: html [
 	html form
-		tbsPullLeft;
+		tbsPullRight;
 		with: [
-			html tbsNavbarButton
+			html tbsNavbarButton bePrimary
 				callback: [ self login ];
 				with: 'Login with Google'
 		]
@@ -295,7 +294,15 @@ body {
 .navbar img {
 	height: 40px;
 	margin-left: 10px;
+	margin-right: 10px;
 	border-radius: 50%;
+}
+.navbar .btn {
+	margin-top: 15px;
+	margin-right: 20px;
+}
+.navbar .navbar-brand {
+	margin-top: 10px;
 }
 .sidebar {
 	position: fixed;
