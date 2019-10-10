@@ -14,7 +14,7 @@ If just the year is known, it is the 1st of June of that year.
 For #between, it is the mid point between the bounds.
 "
 Class {
-	#name : #FamilyEventDate,
+	#name : #EventDate,
 	#superclass : #Object,
 	#instVars : [
 		'type',
@@ -33,18 +33,31 @@ Class {
 	#category : #Genealogy
 }
 
+{ #category : #converting }
+EventDate class >> dateForYear: aYear month: aMonth day: aDay [
+	| aStream |
+	aYear ifNil: [ ^ nil ].
+	aStream := WriteStream on: String new.
+	aYear printOn: aStream.
+	aStream nextPut: $-.
+	(aMonth ifNil: [ 6 ]) printOn: aStream.
+	aStream nextPut: $-.
+	(aDay ifNil: [ 15 ]) printOn: aStream.
+	^ aStream contents asDate
+]
+
 { #category : #'instance creation' }
-FamilyEventDate class >> forType: aType year: aYear month: aMonth day: aDay [
+EventDate class >> forType: aType year: aYear month: aMonth day: aDay [
 	^ self new type: aType; year: aYear; month: aMonth; day: aDay
 ]
 
 { #category : #'instance creation' }
-FamilyEventDate class >> forYear: aYear month: aMonth day: aDay [
+EventDate class >> forYear: aYear month: aMonth day: aDay [
 	^ self forType: #at year: aYear month: aMonth day: aDay
 ]
 
 { #category : #'instance creation' }
-FamilyEventDate class >> fromString: aString [
+EventDate class >> fromString: aString [
 	| regex type year month day toYear toMonth toDay eventDate |
 	aString ifNil: [ ^ nil ].
 	regex := self regexMatcher.
@@ -68,52 +81,64 @@ FamilyEventDate class >> fromString: aString [
 ]
 
 { #category : #accessing }
-FamilyEventDate class >> monthFor: aString [
+EventDate class >> monthFor: aString [
 	^ self monthLookup at: aString ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
-FamilyEventDate class >> monthLookup [
+EventDate class >> monthLookup [
 	^ MonthLookup ifNil: [ MonthLookup := { 'jan ' -> 1 . 'feb ' -> 2 . 'mar ' -> 3 . 'apr ' -> 4 . 'may ' -> 5 . 'jun ' -> 6 . 'jul ' -> 7 . 'aug ' -> 8 . 'sep ' -> 9 . 'oct ' -> 10 . 'nov ' -> 11 . 'dec ' -> 12 } asDictionary ]
 ]
 
 { #category : #accessing }
-FamilyEventDate class >> monthNameFor: aMonthNumber [
+EventDate class >> monthNameFor: aMonthNumber [
 	^ self monthNames at: aMonthNumber ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
-FamilyEventDate class >> monthNames [
+EventDate class >> monthNames [
 	^ MonthNames ifNil: [ MonthNames := #('jan' 'feb' 'mar' 'apr' 'may' 'jun' 'jul' 'aug' 'sep' 'oct' 'nov' 'dec') ]
 ]
 
 { #category : #matching }
-FamilyEventDate class >> regexMatcher [
+EventDate class >> regexMatcher [
 	^ DateRegex ifNil: [ DateRegex := '((bet|bef|aft) )?(\d\d? )?([a-z]+ ?)?(\d\d\d\d)?( and (\d\d? )?([a-z]+ ?)?(\d\d\d\d)?)?' asRegex ]
 ]
 
 { #category : #accessing }
-FamilyEventDate >> day [
+EventDate >> day [
 	^ day
 ]
 
 { #category : #accessing }
-FamilyEventDate >> day: aNumber [
+EventDate >> day: aNumber [
 	day := aNumber
 ]
 
 { #category : #accessing }
-FamilyEventDate >> month [
+EventDate >> effectiveDate [
+	| start end |
+	start := self class dateForYear: self year month: self month day: self day.
+	start ifNil: [ ^ nil ].
+	self type = #between
+		ifFalse: [ ^ start ].
+	end := self class dateForYear: self toYear month: self toMonth day: self toDay.
+	end ifNil: [ ^ start ].
+	^ (start + (end - start / 2)) asDate
+]
+
+{ #category : #accessing }
+EventDate >> month [
 	^ month
 ]
 
 { #category : #accessing }
-FamilyEventDate >> month: aNumber [
+EventDate >> month: aNumber [
 	month := aNumber
 ]
 
 { #category : #printing }
-FamilyEventDate >> printOn: aStream [
+EventDate >> printOn: aStream [
 	| parts |
 	parts := OrderedCollection new.
 	type = #before ifTrue: [ parts add: 'bef' ].
@@ -128,55 +153,55 @@ FamilyEventDate >> printOn: aStream [
 		toMonth ifNotNil: [ parts add: (self class monthNameFor: toMonth) ].
 		toYear ifNotNil: [ parts add: toYear asString ]
 	].
-	^ aStream nextPutAll: (' ' join: parts)
+	aStream nextPutAll: (' ' join: parts)
 ]
 
 { #category : #accessing }
-FamilyEventDate >> toDay [
+EventDate >> toDay [
 	^ toDay
 ]
 
 { #category : #accessing }
-FamilyEventDate >> toDay: aNumber [
+EventDate >> toDay: aNumber [
 	toDay := aNumber
 ]
 
 { #category : #accessing }
-FamilyEventDate >> toMonth [
+EventDate >> toMonth [
 	^ toMonth
 ]
 
 { #category : #accessing }
-FamilyEventDate >> toMonth: aNumber [
+EventDate >> toMonth: aNumber [
 	toMonth := aNumber
 ]
 
 { #category : #accessing }
-FamilyEventDate >> toYear [
+EventDate >> toYear [
 	^ toYear
 ]
 
 { #category : #accessing }
-FamilyEventDate >> toYear: aNumber [
+EventDate >> toYear: aNumber [
 	toYear := aNumber
 ]
 
 { #category : #accessing }
-FamilyEventDate >> type [
+EventDate >> type [
 	^ type
 ]
 
 { #category : #accessing }
-FamilyEventDate >> type: aTypeSymbol [
+EventDate >> type: aTypeSymbol [
 	type := aTypeSymbol
 ]
 
 { #category : #accessing }
-FamilyEventDate >> year [
+EventDate >> year [
 	^ year
 ]
 
 { #category : #accessing }
-FamilyEventDate >> year: aNumber [
+EventDate >> year: aNumber [
 	year := aNumber
 ]
