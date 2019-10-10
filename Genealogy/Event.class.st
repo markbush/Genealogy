@@ -35,7 +35,7 @@ Event >> dateAndLocationString [
 	| s |
 	date ifNil: [ ^ '' ].
 	s := WriteStream on: String new.
-	s nextPutAll: date asString.
+	s nextPutAll: self dateString.
 	location ifNotNil: [
 		s nextPutAll: ' ('.
 		s nextPutAll: location.
