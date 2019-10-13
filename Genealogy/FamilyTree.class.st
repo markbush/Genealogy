@@ -44,7 +44,7 @@ FamilyTree class >> defaultRedirectUrl [
 	url := ZnUrl fromString: 'https://accounts.google.com/o/oauth2/v2/auth'.
 	query := ZnMultiValueDictionary new.
 	query at: 'scope' add: self defaultScopes.
-	query at: 'redirect_uri' add: 'http://localhost:8080/family'.
+	query at: 'redirect_uri' add: 'http://localhost:8888/family'.
 	query at: 'response_type' add: 'code'.
 	query at: 'client_id' add: self clientId.
 	url query: query.
@@ -106,7 +106,7 @@ FamilyTree class >> tokenRequestForCode: code [
 	query at: 'code' put: code.
 	query at: 'client_id' put: self clientId.
 	query at: 'client_secret' put: self clientSecret.
-	query at: 'redirect_uri' put: 'http://localhost:8080/family'.
+	query at: 'redirect_uri' put: 'http://localhost:8888/family'.
 	query at: 'grant_type' put: 'authorization_code'.
 	request formAddAll: query.
 	^ request
@@ -335,7 +335,7 @@ body {
 	margin-top: 10px;
 }
 .navbar .form-inline {
-	margin-top: 15px;
+	margin-top: 17px;
 }
 .navbar img {
 	height: 40px;

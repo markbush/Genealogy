@@ -239,9 +239,9 @@ Person >> forenames: aString [
 Person >> fullName [
 	| nameParts |
 	nameParts := OrderedCollection new.
-	self forenames ifNotNil: [ nameParts add: self forenames ].
-	self nickname ifNotNil: [ nameParts add: '/' , self nickname , '/' ].
-	self surname ifNotNil: [ nameParts add: '(' , self surname , ')' ].
+	self forenames isEmptyOrNil ifFalse: [ nameParts add: self forenames ].
+	self nickname isEmptyOrNil ifFalse: [ nameParts add: '/' , self nickname , '/' ].
+	self surname isEmptyOrNil ifFalse: [ nameParts add: '(' , self surname , ')' ].
 	^ ' ' join: nameParts
 ]
 

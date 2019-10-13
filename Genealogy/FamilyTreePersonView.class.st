@@ -16,7 +16,7 @@ Class {
 
 { #category : #defaults }
 FamilyTreePersonView class >> defaultGenders [
-	^ #('male' 'female' 'unknown' 'non binary' 'other')
+	^ #('unknown' 'male' 'female' 'non binary' 'other')
 ]
 
 { #category : #'instance creation' }
@@ -198,9 +198,13 @@ FamilyTreePersonView >> renderGenderOn: html [
 				toggle
 		);
 		with: [
-			html text: 'Gender: '.
-			html text: self person gender
-		]
+			html span: [
+				html tbsGlyphIcon iconEdit
+			]
+		].
+	html space.
+	html text: 'Gender: '.
+	html text: self person gender
 ]
 
 { #category : #rendering }
@@ -299,9 +303,13 @@ FamilyTreePersonView >> renderPersonForenamesOn: html [
 				toggle
 		);
 		with: [
-			html text: 'Forenames: '.
-			html text: self person forenames
-		]
+			html span: [
+				html tbsGlyphIcon iconEdit
+			]
+		].
+	html space.
+	html text: 'Forenames: '.
+	html text: self person forenames
 ]
 
 { #category : #rendering }
@@ -324,9 +332,13 @@ FamilyTreePersonView >> renderPersonNicknameOn: html [
 				toggle
 		);
 		with: [
-			html text: 'Nickname: '.
-			html text: self person nickname
-		]
+			html span: [
+				html tbsGlyphIcon iconEdit
+			]
+		].
+	html space.
+	html text: 'Nickname: '.
+	html text: self person nickname
 ]
 
 { #category : #rendering }
@@ -361,9 +373,13 @@ FamilyTreePersonView >> renderPersonSurnameOn: html [
 				toggle
 		);
 		with: [
-			html text: 'Surname: '.
-			html text: self person surname
-		]
+			html span: [
+				html tbsGlyphIcon iconEdit
+			]
+		].
+	html space.
+	html text: 'Surname: '.
+	html text: self person surname.
 ]
 
 { #category : #rendering }
