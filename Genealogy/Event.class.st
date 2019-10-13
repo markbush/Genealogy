@@ -54,7 +54,7 @@ Event >> dateString [
 { #category : #accessing }
 Event >> effectiveDate [
 	"If no date, use 01/01/0001"
-	self date ifNil: [ ^ ('1-1-101' asDate - 100 years - 24 days) asDate ].
+	self date ifNil: [ ^ nil "('1-1-101' asDate - 100 years - 24 days) asDate" ].
 	^ date effectiveDate
 ]
 

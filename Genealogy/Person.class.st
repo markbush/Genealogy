@@ -21,6 +21,12 @@ Class {
 	#category : #Genealogy
 }
 
+{ #category : #'date operations' }
+Person class >> ageFrom: aDate to: laterDate [
+	"Accurate enough representation of age (rounded to nearest .1)"
+	^ ((laterDate - aDate) days / 365.25) round: 1
+]
+
 { #category : #accesing }
 Person class >> allPeople [
 	^ People values sorted: [ :a :b | a fullName <= b fullName ]
@@ -84,6 +90,23 @@ Person >> addEvent: anEvent [
 Person >> addRelationship: aFamily [
 	aFamily ifNil: [ ^ self ].
 	self relationships add: aFamily
+]
+
+{ #category : #accessing }
+Person >> age [
+	| birthDate deathDate age |
+	self birth ifNil: [ ^ nil ].
+	birthDate := self birth effectiveDate.
+	birthDate ifNil: [ ^ nil ].
+	age := self class ageFrom: birthDate to: Date today.
+	self isAlive ifTrue: [
+		age < 100
+			ifTrue: [ ^ age ]
+			ifFalse: [ ^ nil ] "Maybe deseased without death recorded?"
+	].
+	deathDate := self death effectiveDate.
+	deathDate ifNil: [ ^ nil ]. "Cannot determine death properly."
+	^ self class ageFrom: birthDate to: deathDate
 ]
 
 { #category : #accessing }

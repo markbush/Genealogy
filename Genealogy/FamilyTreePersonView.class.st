@@ -101,8 +101,16 @@ FamilyTreePersonView >> renderContentOn: html [
 FamilyTreePersonView >> renderDatesForPerson: aPerson on: html [
 	html text: ' [b: '.
 	html text: aPerson birthString.
+	(aPerson isAlive and: [ aPerson age isNotNil ])
+		ifTrue: [
+			html text: ' (' , aPerson age truncated printString , ')'
+		].
 	html text: ', d: '.
 	html text: aPerson deathString.
+	(aPerson isDeceased and: [ aPerson age isNotNil ])
+		ifTrue: [
+			html text: ' (' , aPerson age truncated printString , ')'
+		].
 	html text: ']'
 ]
 
@@ -243,9 +251,15 @@ FamilyTreePersonView >> renderPartner: aPartner on: html [
 FamilyTreePersonView >> renderPersonBirthOn: html [
 	html heading
 		level: 5;
-		with: [
+		with: [ | age |
 			html text: 'Born: '.
-			html text: self person birthWithLocationString
+			html text: self person birthWithLocationString.
+			self person isAlive ifTrue: [
+				age := self person age.
+				age ifNotNil: [
+					html text: ' (' , age printString , ' years old)'
+				]
+			]
 		]
 ]
 
@@ -253,9 +267,15 @@ FamilyTreePersonView >> renderPersonBirthOn: html [
 FamilyTreePersonView >> renderPersonDeathOn: html [
 	html heading
 		level: 5;
-		with: [
+		with: [ | age |
 			html text: 'Died: '.
-			html text: self person deathWithLocationString
+			html text: self person deathWithLocationString.
+			self person isDeceased ifTrue: [
+				age := self person age.
+				age ifNotNil: [
+					html text: ' (at ' , age printString , ' years old)'
+				]
+			]
 		]
 ]
 

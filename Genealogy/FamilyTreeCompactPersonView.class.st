@@ -47,7 +47,11 @@ FamilyTreeCompactPersonView >> renderBirthOn: html [
 				mediumSize: 10;
 				with: [
 					html text: 'b: '.
-					html text: self person birthString
+					html text: self person birthString.
+					(self person isAlive and: [ self person age isNotNil ])
+						ifTrue: [
+							html text: ' (' , self person age truncated printString , ')'
+						]
 				]
 		]
 ]
@@ -78,7 +82,11 @@ FamilyTreeCompactPersonView >> renderDeathOn: html [
 				mediumSize: 10;
 				with: [
 					html text: 'd: '.
-					html text: self person deathString
+					html text: self person deathString.
+					(self person isDeceased and: [ self person age isNotNil ])
+						ifTrue: [
+							html text: ' (' , self person age truncated printString , ')'
+						]
 				]
 		]
 ]

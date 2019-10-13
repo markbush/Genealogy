@@ -329,6 +329,7 @@ FamilyTree >> style [
 body {
 	height: 100%;
 	padding-top: 71px;
+	padding-bottom: 20px;
 }
 .navbar .navbar-brand {
 	margin-top: 10px;
