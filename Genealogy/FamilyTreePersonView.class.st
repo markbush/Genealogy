@@ -295,11 +295,21 @@ FamilyTreePersonView >> renderPersonSurnameOn: html [
 { #category : #rendering }
 FamilyTreePersonView >> renderRelationship: aFamily on: html [
 	aFamily partners do: [ :partner | self renderPartner: partner on: html ] without: self person.
+	aFamily events do: [ :e | self renderRelationshipEvent: e on: html ].
 	aFamily children ifEmpty: [ ^ self ].
 	html heading level: 5; with: 'Children'.
-	aFamily children do: [ :child |
-		self renderCompactPerson: child on: html
-	]
+	aFamily children do: [ :child | self renderCompactPerson: child on: html ]
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderRelationshipEvent: anEvent on: html [
+	^ html heading
+		level: 4;
+		with: [
+			html text: anEvent type.
+			html space.
+			html text: anEvent dateAndLocationString
+		]
 ]
 
 { #category : #rendering }

@@ -19,6 +19,11 @@ Class {
 
 { #category : #accessing }
 Family class >> allFamilies [
+	^ Families values
+]
+
+{ #category : #accessing }
+Family class >> allFamiliesDict [
 	^ Families
 ]
 
