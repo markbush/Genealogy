@@ -369,6 +369,12 @@ body {
 	font-size: 120%;
 	font-weight: bold;
 }
+.person-info {
+	font-weight: bold;
+}
+.person-label {
+	color: blue;
+}
 .main {
 }
 '

@@ -178,36 +178,6 @@ FamilyTreePersonView >> renderGenderFormOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreePersonView >> renderGenderOn: html [
-	html anchor
-		url: '#genderEditorModal';
-		attributeAt: 'data-toggle' put: 'modal';
-		onClick: (
-			(html jQuery id: #genderEditorTitle) load
-				html: [ :ajaxHtml |
-					self editField: #gender:.
-					self editValue: self person gender.
-					ajaxHtml text: 'Edit gender'
-				]
-		);
-		onClick: (
-			(html jQuery id: #genderEditorText) value: (self class valueForGender: self person gender)
-		);
-		onClick: (
-			(html jQuery id: #genderEditorModal)
-				toggle
-		);
-		with: [
-			html span: [
-				html tbsGlyphIcon iconEdit
-			]
-		].
-	html space.
-	html text: 'Gender: '.
-	html text: self person gender
-]
-
-{ #category : #rendering }
 FamilyTreePersonView >> renderGrandParentsOn: html [
 	html heading level: 3; with: 'Grandparents'.
 	self person grandParents do: [ :grandParent |
@@ -217,12 +187,17 @@ FamilyTreePersonView >> renderGrandParentsOn: html [
 
 { #category : #rendering }
 FamilyTreePersonView >> renderMainInfoOn: html [
-	self renderPersonForenamesOn: html. html break.
-	self renderPersonSurnameOn: html. html break.
-	self renderPersonNicknameOn: html. html break.
-	self renderGenderOn: html.
-	self renderPersonBirthOn: html.
-	self renderPersonDeathOn: html
+	html div
+		class: 'person-info';
+		with: [
+			self renderPersonForenamesOn: html. html break.
+			self renderPersonSurnameOn: html. html break.
+			self renderPersonNicknameOn: html. html break.
+			self renderPersonGenderOn: html. html break.
+			self renderPersonBirthOn: html. html break.
+			self renderPersonDeathOn: html
+		]
+
 ]
 
 { #category : #rendering }
@@ -253,91 +228,48 @@ FamilyTreePersonView >> renderPartner: aPartner on: html [
 
 { #category : #rendering }
 FamilyTreePersonView >> renderPersonBirthOn: html [
-	html heading
-		level: 5;
-		with: [ | age |
-			html text: 'Born: '.
-			html text: self person birthWithLocationString.
-			self person isAlive ifTrue: [
-				age := self person age.
-				age ifNotNil: [
-					html text: ' (' , age printString , ' years old)'
-				]
-			]
-		]
+	| age |
+	html space.
+	html span class: 'person-label'; with: 'Born: '.
+	html text: self person birthWithLocationString.
+	self person isDeceased ifTrue: [ ^ self ].
+	age := self person age.
+	age ifNotNil: [
+		html text: ' (' , age printString , ' years old)'
+	]
 ]
 
 { #category : #rendering }
 FamilyTreePersonView >> renderPersonDeathOn: html [
-	html heading
-		level: 5;
-		with: [ | age |
-			html text: 'Died: '.
-			html text: self person deathWithLocationString.
-			self person isDeceased ifTrue: [
-				age := self person age.
-				age ifNotNil: [
-					html text: ' (at ' , age printString , ' years old)'
-				]
-			]
-		]
+	| age |
+	html space.
+	html span class: 'person-label'; with: 'Died: '.
+	html text: self person deathWithLocationString.
+	self person isAlive ifTrue: [ ^ self ].
+	age := self person age.
+	age ifNotNil: [
+		html text: ' (at ' , age printString , ' years old)'
+	]
 ]
 
 { #category : #rendering }
 FamilyTreePersonView >> renderPersonForenamesOn: html [
-	html anchor
-		url: '#textEditorModal';
-		attributeAt: 'data-toggle' put: 'modal';
-		onClick: (
-			(html jQuery id: #textEditorTitle) load
-				html: [ :ajaxHtml |
-					self editField: #forenames:.
-					ajaxHtml text: 'Edit forenames'
-				]
-		);
-		onClick: (
-			(html jQuery id: #textEditorText) value: self person forenames
-		);
-		onClick: (
-			(html jQuery id: #textEditorModal)
-				toggle
-		);
-		with: [
-			html span: [
-				html tbsGlyphIcon iconEdit
-			]
-		].
-	html space.
-	html text: 'Forenames: '.
+	self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit forenames' fieldSelector: #forenames: inputId: #textEditorText valueBlock: [ self person forenames ].
+	html span class: 'person-label'; with: 'Forenames: '.
 	html text: self person forenames
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderPersonGenderOn: html [
+	self renderTo: html linkForModal: #genderEditorModal titleId: #genderEditorTitle title: 'Edit gender' fieldSelector: #gender: inputId: #genderEditorText valueBlock: [ self class valueForGender: self person gender ].
+	html span class: 'person-label'; with: 'Gender: '.
+	html text: self person gender
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderPersonNicknameOn: html [
-	html anchor
-		url: '#textEditorModal';
-		attributeAt: 'data-toggle' put: 'modal';
-		onClick: (
-			(html jQuery id: #textEditorTitle) load
-				html: [ :ajaxHtml |
-					self editField: #nickname:.
-					ajaxHtml text: 'Edit nickname'
-				]
-		);
-		onClick: (
-			(html jQuery id: #textEditorText) value: self person nickname
-		);
-		onClick: (
-			(html jQuery id: #textEditorModal)
-				toggle
-		);
-		with: [
-			html span: [
-				html tbsGlyphIcon iconEdit
-			]
-		].
-	html space.
-	html text: 'Nickname: '.
+	self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit nickname' fieldSelector: #nickname: inputId: #textEditorText valueBlock: [ self person nickname ].
+	html span class: 'person-label'; with: 'Nickname: '.
 	html text: self person nickname
 ]
 
@@ -355,30 +287,8 @@ FamilyTreePersonView >> renderPersonOn: html [
 
 { #category : #rendering }
 FamilyTreePersonView >> renderPersonSurnameOn: html [
-	html anchor
-		url: '#textEditorModal';
-		attributeAt: 'data-toggle' put: 'modal';
-		onClick: (
-			(html jQuery id: #textEditorTitle) load
-				html: [ :ajaxHtml |
-					self editField: #surname:.
-					ajaxHtml text: 'Edit surname'
-				]
-		);
-		onClick: (
-			(html jQuery id: #textEditorText) value: self person surname
-		);
-		onClick: (
-			(html jQuery id: #textEditorModal)
-				toggle
-		);
-		with: [
-			html span: [
-				html tbsGlyphIcon iconEdit
-			]
-		].
-	html space.
-	html text: 'Surname: '.
+	self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit surname' fieldSelector: #surname: inputId: #textEditorText valueBlock: [ self person surname ].
+	html span class: 'person-label'; with: 'Surname: '.
 	html text: self person surname.
 ]
 
@@ -457,6 +367,33 @@ FamilyTreePersonView >> renderTextEditorOn: html [
 			]
 		]	
 	]
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock [
+	html anchor
+		url: aModalSymbol printString;
+		attributeAt: 'data-toggle' put: 'modal';
+		onClick: (
+			(html jQuery id: titleId) load
+				html: [ :ajaxHtml |
+					self editField: aSelector.
+					ajaxHtml text: title
+				]
+		);
+		onClick: (
+			(html jQuery id: inputId) value: aBlock value
+		);
+		onClick: (
+			(html jQuery id: aModalSymbol)
+				toggle
+		);
+		with: [
+			html span: [
+				html tbsGlyphIcon iconEdit
+			]
+		].
+	html space
 ]
 
 { #category : #accessing }
