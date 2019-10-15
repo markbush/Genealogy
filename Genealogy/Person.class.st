@@ -152,7 +152,8 @@ Person >> birthString [
 Person >> birthString: aString [
 	| date |
 	date := EventDate fromString: aString.
-	date ifNil: [ ^ self ].
+	(date isNil and: [ aString isEmptyOrNil not ])
+		ifTrue: [ ^ self ].
 	birth
 		ifNil: [ birth := Event forType: #birth on: date at: nil ]
 		ifNotNil: [ birth date: date ]

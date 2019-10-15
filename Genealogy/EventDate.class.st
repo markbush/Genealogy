@@ -71,10 +71,10 @@ EventDate class >> fromString: aString [
 	type isSymbol ifFalse: [ type := #at ].
 	(regex subexpression: 4) ifNotNil: [ :s | day := s asNumber ].
 	(regex subexpression: 5) ifNotNil: [ :s | month := self monthFor: s ].
-	(regex subexpression: 6) ifNotNil: [ :s | year := s asNumber ].
-	(regex subexpression: 8) ifNotNil: [ :s | toDay := s asNumber ].
-	(regex subexpression: 9) ifNotNil: [ :s | toMonth := self monthFor: s ].
-	(regex subexpression: 10) ifNotNil: [ :s | toYear := s asNumber ].
+	(regex subexpression: 7) ifNotNil: [ :s | year := s asNumber ].
+	(regex subexpression: 9) ifNotNil: [ :s | toDay := s asNumber ].
+	(regex subexpression: 10) ifNotNil: [ :s | toMonth := self monthFor: s ].
+	(regex subexpression: 12) ifNotNil: [ :s | toYear := s asNumber ].
 	eventDate := self forType: type year: year month: month day: day.
 	type = #between
 		ifTrue: [ eventDate toYear: toYear; toMonth: toMonth; toDay: toDay ].
@@ -103,7 +103,17 @@ EventDate class >> monthNames [
 
 { #category : #matching }
 EventDate class >> regexMatcher [
-	^ DateRegex ifNil: [ DateRegex := '((bet|bef|aft) )?(\d\d? )?([a-z]+ ?)?(\d\d\d\d)?( and (\d\d? )?([a-z]+ ?)?(\d\d\d\d)?)?' asRegex ]
+	^ DateRegex ifNil: [ DateRegex := '((bet|bef|aft) )?(\d\d? )?((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) ?)?(\d\d\d\d)?( and (\d\d? )?((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) ?)?(\d\d\d\d)?)?' asRegex ]
+]
+
+{ #category : #accessing }
+EventDate class >> resetMonthLookup [
+	MonthLookup := nil
+]
+
+{ #category : #matching }
+EventDate class >> resetRegexMatcher [
+	DateRegex := nil
 ]
 
 { #category : #accessing }
