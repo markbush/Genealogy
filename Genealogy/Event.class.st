@@ -13,10 +13,10 @@ Class {
 }
 
 { #category : #'instance creation' }
-Event class >> forType: aType on: aDateString at: aLocation [
+Event class >> forType: aType on: anEventDate at: aLocation [
 	^ self new
 		type: aType;
-		date: aDateString;
+		date: anEventDate;
 		location: aLocation
 ]
 

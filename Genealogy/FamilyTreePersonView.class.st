@@ -227,11 +227,29 @@ FamilyTreePersonView >> renderPartner: aPartner on: html [
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderPersonBirthDateOn: html [
+	self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit birth date' fieldSelector: #birthString: inputId: #textEditorText valueBlock: [ self person birthString ].
+	html span class: 'person-label'; with: 'Born: '.
+	html text: self person birthString
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderPersonBirthLocationOn: html [
+	html span
+		with: [
+			html text: ' ('.
+			self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit birth location' fieldSelector: #birthLocation: inputId: #textEditorText valueBlock: [ self person birthLocation ].
+			html span class: 'person-label'; with: 'Location: '.
+			html text: self person birthLocation.
+			html text: ')'
+		]
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderPersonBirthOn: html [
 	| age |
-	html space.
-	html span class: 'person-label'; with: 'Born: '.
-	html text: self person birthWithLocationString.
+	self renderPersonBirthDateOn: html.
+	self renderPersonBirthLocationOn: html.
 	self person isDeceased ifTrue: [ ^ self ].
 	age := self person age.
 	age ifNotNil: [
@@ -240,11 +258,33 @@ FamilyTreePersonView >> renderPersonBirthOn: html [
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderPersonDeathDateOn: html [
+	self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit death date' fieldSelector: #deathString: inputId: #textEditorText valueBlock: [ self person deathString ].
+	html span
+		class: (self person isAlive ifTrue: [ 'person-label-subdued' ] ifFalse: [ 'person-label' ]);
+		with: 'Died: '.
+	html text: self person deathString
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderPersonDeathLocationOn: html [
+	html span
+		with: [
+			html text: ' ('.
+			self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit death location' fieldSelector: #deathLocation: inputId: #textEditorText valueBlock: [ self person deathLocation ].
+			html span
+				class: (self person isAlive ifTrue: [ 'person-label-subdued' ] ifFalse: [ 'person-label' ]);
+				with: 'Location: '.
+			html text: self person deathLocation.
+			html text: ')'
+		]
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderPersonDeathOn: html [
 	| age |
-	html space.
-	html span class: 'person-label'; with: 'Died: '.
-	html text: self person deathWithLocationString.
+	self renderPersonDeathDateOn: html.
+	self renderPersonDeathLocationOn: html.
 	self person isAlive ifTrue: [ ^ self ].
 	age := self person age.
 	age ifNotNil: [
@@ -418,7 +458,8 @@ FamilyTreePersonView >> selectedView: aView [
 
 { #category : #updating }
 FamilyTreePersonView >> updatePerson [
-	self editField ifNil: [ ^ self ].
+	(self editField isNil or: [ self editValue isNil ])
+		ifTrue: [ ^ self ].
 	self person perform: self editField with: self editValue.
 	self editField: nil.
 	self editValue: nil

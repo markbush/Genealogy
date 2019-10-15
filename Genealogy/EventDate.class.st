@@ -67,6 +67,7 @@ EventDate class >> fromString: aString [
 	type = 'bef' ifTrue: [ type := #before ].
 	type = 'aft' ifTrue: [ type := #after ].
 	type = 'bet' ifTrue: [ type := #between ].
+	type = 'abt' ifTrue: [ type := #about ].
 	type isSymbol ifFalse: [ type := #at ].
 	(regex subexpression: 4) ifNotNil: [ :s | day := s asNumber ].
 	(regex subexpression: 5) ifNotNil: [ :s | month := self monthFor: s ].
@@ -144,6 +145,7 @@ EventDate >> printOn: aStream [
 	type = #before ifTrue: [ parts add: 'bef' ].
 	type = #after ifTrue: [ parts add: 'aft' ].
 	type = #between ifTrue: [ parts add: 'bet' ].
+	type = #about ifTrue: [ parts add: 'abt' ].
 	day ifNotNil: [ parts add: day asString ].
 	month ifNotNil: [ parts add: (self class monthNameFor: month) ].
 	year ifNotNil: [ parts add: year asString ].

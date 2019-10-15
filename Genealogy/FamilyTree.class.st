@@ -375,6 +375,9 @@ body {
 .person-label {
 	color: blue;
 }
+.person-label-subdued {
+	color: grey;
+}
 .main {
 }
 '

@@ -128,10 +128,34 @@ Person >> birth: anEvent [
 ]
 
 { #category : #accessing }
+Person >> birthLocation [
+	^ birth
+		ifNil: [ '' ]
+		ifNotNil: [ birth location ]
+]
+
+{ #category : #accessing }
+Person >> birthLocation: aString [
+	birth
+		ifNil: [ birth := Event forType: #birth on: nil at: aString ]
+		ifNotNil: [ birth location: aString ]
+]
+
+{ #category : #accessing }
 Person >> birthString [
 	^ birth
 		ifNil: [ '' ]
 		ifNotNil: [ birth dateString ]
+]
+
+{ #category : #accessing }
+Person >> birthString: aString [
+	| date |
+	date := EventDate fromString: aString.
+	date ifNil: [ ^ self ].
+	birth
+		ifNil: [ birth := Event forType: #birth on: date at: nil ]
+		ifNotNil: [ birth date: date ]
 ]
 
 { #category : #accessing }
@@ -197,10 +221,35 @@ Person >> death: anEvent [
 ]
 
 { #category : #accessing }
+Person >> deathLocation [
+	^ death
+		ifNil: [ '' ]
+		ifNotNil: [ death location ]
+]
+
+{ #category : #accessing }
+Person >> deathLocation: aString [
+	death
+		ifNil: [ death := Event forType: #death on: nil at: aString ]
+		ifNotNil: [ death location: aString ]
+]
+
+{ #category : #accessing }
 Person >> deathString [
 	^ death
 		ifNil: [ '' ]
 		ifNotNil: [ death dateString ]
+]
+
+{ #category : #accessing }
+Person >> deathString: aString [
+	| date |
+	date := EventDate fromString: aString.
+	(date isNil and: [ aString isEmptyOrNil not ])
+		ifTrue: [ ^ self ].
+	death
+		ifNil: [ death := Event forType: #death on: date at: nil ]
+		ifNotNil: [ death date: date ]
 ]
 
 { #category : #accessing }
@@ -277,12 +326,12 @@ Person >> greatGrandParents [
 
 { #category : #testing }
 Person >> isAlive [
-	^ self death isNil
+	^ self death isNil or: [ self death dateString isEmptyOrNil ]
 ]
 
 { #category : #testing }
 Person >> isDeceased [
-	^ self death isNotNil
+	^ self isAlive not
 ]
 
 { #category : #accessing }
