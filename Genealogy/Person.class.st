@@ -13,7 +13,8 @@ Class {
 		'death',
 		'events',
 		'family',
-		'relationships'
+		'relationships',
+		'notes'
 	],
 	#classInstVars : [
 		'People'
@@ -84,6 +85,11 @@ Person class >> initialize [
 Person >> addEvent: anEvent [
 	anEvent ifNil: [ ^ self ].
 	self events add: anEvent
+]
+
+{ #category : #accessing }
+Person >> addNote: aNote [
+	self notes add: aNote
 ]
 
 { #category : #operations }
@@ -376,6 +382,11 @@ Person >> niecesAndNephewsWithPartners [
 ]
 
 { #category : #accessing }
+Person >> notes [
+	^ notes ifNil: [ notes := OrderedCollection new ]
+]
+
+{ #category : #accessing }
 Person >> parentGeneration [
 	| parentSiblings parentGeneration |
 	parentSiblings := self parentSiblings.
@@ -418,6 +429,11 @@ Person >> partner [
 { #category : #accessing }
 Person >> relationships [
 	^ relationships ifNil: [ relationships := OrderedCollection new ]
+]
+
+{ #category : #accessing }
+Person >> removeNote: aNote [
+	self notes remove: aNote ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }

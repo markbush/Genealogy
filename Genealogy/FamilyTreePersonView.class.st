@@ -116,15 +116,15 @@ FamilyTreePersonView >> renderDatesForPerson: aPerson on: html [
 
 { #category : #rendering }
 FamilyTreePersonView >> renderGenderEditorOn: html [
-	html tbsModal id: #genderEditorModal; with: [  
+	html tbsModal id: #genderEditorModal; with: [
 		html tbsModalDialog: [
-			html tbsModalContent: [ 
-				html tbsModalHeader: [ 
+			html tbsModalContent: [
+				html tbsModalHeader: [
 					html tbsModalCloseIcon.
 					html tbsModalTitle
 						id: #genderEditorTitle;
 						level: 4;
-						with: 'Editor'				
+						with: 'Editor'
 				 ].
 				html tbsModalBody: [
 					html div
@@ -133,10 +133,7 @@ FamilyTreePersonView >> renderGenderEditorOn: html [
 							self renderGenderFormOn: html
 						]
 				].
-				html tbsModalFooter: [ 
-					html tbsButton
-						attributeAt: 'data-dismiss' put: 'modal';
-						with: 'Close'.
+				html tbsModalFooter: [
 					html tbsButton
 						bePrimary;
 						attributeAt: 'data-dismiss' put: 'modal';
@@ -153,10 +150,10 @@ FamilyTreePersonView >> renderGenderEditorOn: html [
 									self selectedView renderPersonOn: ajaxHtml
 								]
 						);
-						with: 'Save' 	
+						with: 'Save'
 				 ]
 			]
-		]	
+		]
 	]
 ]
 
@@ -195,7 +192,7 @@ FamilyTreePersonView >> renderMainInfoOn: html [
 			self renderPersonNicknameOn: html. html break.
 			self renderPersonGenderOn: html. html break.
 			self renderPersonBirthOn: html. html break.
-			self renderPersonDeathOn: html
+			self renderPersonDeathOn: html. html break.
 		]
 
 ]
@@ -314,11 +311,49 @@ FamilyTreePersonView >> renderPersonNicknameOn: html [
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderPersonNote: aNote on: html [
+	html paragraph with: [
+		html anchor
+			url: '#';
+			onClick: (
+				((html jQuery id: #main) load)
+					html: [ :ajaxHtml |
+						self person removeNote: aNote.
+						self parentView renderPersonOn: ajaxHtml
+					]
+				);
+			with: [
+				html span with: [
+					html tbsGlyphIcon iconRemove
+				]
+			].
+		html space.
+		html text: aNote
+	]
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderPersonNotesOn: html [
+	html heading
+		level: 4;
+		with: [
+			html text: 'Notes'.
+			html space.
+			self renderTo: html linkForModal: #textAreaEditorModal titleId: #textAreaEditorTitle title: 'Add note' fieldSelector: #addNote: inputId: #textAreaEditorText valueBlock: [ '' ] icon: #iconPlus
+		].
+	self person notes do: [ :note |
+		self renderPersonNote: note on: html
+	]
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderPersonOn: html [
 	self renderTextEditorOn: html.
+	self renderTextAreaEditorOn: html.
 	self renderGenderEditorOn: html.
 	html heading level: 3; with: self person fullName.
 	self renderMainInfoOn: html.
+	self renderPersonNotesOn: html.
 	self renderGrandParentsOn: html.
 	self renderParentsOn: html.
 	self renderSiblingsOn: html.
@@ -369,22 +404,24 @@ FamilyTreePersonView >> renderSiblingsOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreePersonView >> renderTextEditorOn: html [
-	html tbsModal id: #textEditorModal; with: [  
+FamilyTreePersonView >> renderTextAreaEditorOn: html [
+	html tbsModal id: #textAreaEditorModal; with: [
 		html tbsModalDialog: [
-			html tbsModalContent: [ 
-				html tbsModalHeader: [ 
+			html tbsModalContent: [
+				html tbsModalHeader: [
 					html tbsModalCloseIcon.
 					html tbsModalTitle
-						id: #textEditorTitle;
+						id: #textAreaEditorTitle;
 						level: 4;
-						with: 'Editor'				
+						with: 'Editor'
 				 ].
 				html tbsModalBody: [
 					html form
 						with: [
-							html textInput
-								id: #textEditorText;
+							html textArea
+								id: #textAreaEditorText;
+								columns: 90;
+								rows: 10;
 								onChange: (
 									(html jQuery this) load
 										serializeForm
@@ -392,10 +429,7 @@ FamilyTreePersonView >> renderTextEditorOn: html [
 								callback: [ :newText | self editValue: newText ]
 						]
 				].
-				html tbsModalFooter: [ 
-					html tbsButton
-						attributeAt: 'data-dismiss' put: 'modal';
-						with: 'Close'.
+				html tbsModalFooter: [
 					html tbsButton
 						bePrimary;
 						attributeAt: 'data-dismiss' put: 'modal';
@@ -412,15 +446,69 @@ FamilyTreePersonView >> renderTextEditorOn: html [
 									self selectedView renderPersonOn: ajaxHtml
 								]
 						);
-						with: 'Save' 	
+						with: 'Save'
 				 ]
 			]
-		]	
+		]
+	]
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderTextEditorOn: html [
+	html tbsModal id: #textEditorModal; with: [
+		html tbsModalDialog: [
+			html tbsModalContent: [
+				html tbsModalHeader: [
+					html tbsModalCloseIcon.
+					html tbsModalTitle
+						id: #textEditorTitle;
+						level: 4;
+						with: 'Editor'
+				 ].
+				html tbsModalBody: [
+					html form
+						with: [
+							html textInput
+								id: #textEditorText;
+								size: 87;
+								onChange: (
+									(html jQuery this) load
+										serializeForm
+								);
+								callback: [ :newText | self editValue: newText ]
+						]
+				].
+				html tbsModalFooter: [
+					html tbsButton
+						bePrimary;
+						attributeAt: 'data-dismiss' put: 'modal';
+						onClick: (
+							((html jQuery id: #main) load)
+								html: [ :ajaxHtml |
+									self updatePerson.
+									self parentView renderPersonOn: ajaxHtml
+								]
+						);
+						onClick: (
+							((html jQuery id: self selectedView viewId) load)
+								html: [ :ajaxHtml |
+									self selectedView renderPersonOn: ajaxHtml
+								]
+						);
+						with: 'Save'
+				 ]
+			]
+		]
 	]
 ]
 
 { #category : #rendering }
 FamilyTreePersonView >> renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock [
+	self renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock icon: #iconEdit
+]
+
+{ #category : #rendering }
+FamilyTreePersonView >> renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock icon: anIconSelector [
 	html anchor
 		url: aModalSymbol printString;
 		attributeAt: 'data-toggle' put: 'modal';
@@ -440,7 +528,7 @@ FamilyTreePersonView >> renderTo: html linkForModal: aModalSymbol titleId: title
 		);
 		with: [
 			html span: [
-				html tbsGlyphIcon iconEdit
+				html tbsGlyphIcon perform: anIconSelector
 			]
 		].
 	html space
