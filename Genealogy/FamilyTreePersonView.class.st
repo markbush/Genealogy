@@ -158,24 +158,6 @@ FamilyTreePersonView >> renderParentsOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreePersonView >> renderPartner: aPartner on: html [
-	html heading
-		level: 4;
-		class: 'selectable';
-		onClick: (
-			((html jQuery id: #main) load)
-				html: [ :ajaxHtml |
-					self parentView selectedPerson: aPartner.
-					self parentView renderPersonOn: ajaxHtml
-				]
-		);
-		with: [
-			html text: aPartner fullName.
-			self renderDatesForPerson: aPartner on: html
-		]
-]
-
-{ #category : #rendering }
 FamilyTreePersonView >> renderPersonBirthDateOn: html [
 	self renderTo: html linkForModal: #textEditorModal titleId: #textEditorTitle title: 'Edit birth date' fieldSelector: #birthString: inputId: #textEditorText valueBlock: [ self person birthString ].
 	html span class: 'person-label'; with: 'Born: '.
@@ -303,7 +285,10 @@ FamilyTreePersonView >> renderPersonOn: html [
 	self renderTextEditorOn: html.
 	self renderTextAreaEditorOn: html.
 	self renderGenderEditorOn: html.
-	html heading level: 3; with: self person fullName.
+	html heading
+		level: 3;
+		class: 'person-label';
+		with: self person fullName.
 	self renderMainInfoOn: html.
 	self renderPersonNotesOn: html.
 	self renderGrandParentsOn: html.
@@ -322,7 +307,11 @@ FamilyTreePersonView >> renderPersonSurnameOn: html [
 { #category : #rendering }
 FamilyTreePersonView >> renderRelationship: aFamily on: html [
 	aFamily partners do: [ :partner |
-		self renderCompactPerson: partner on: html offset: 0
+		html div
+			class: 'person-partner';
+			with: [
+				self renderCompactPerson: partner on: html offset: 0
+			]
 	] without: self person.
 	aFamily events do: [ :e | self renderRelationshipEvent: e on: html ].
 	aFamily children ifEmpty: [ ^ self ].

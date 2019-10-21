@@ -367,6 +367,11 @@ body {
 .person-label-subdued {
 	color: grey;
 }
+.person-partner {
+	font-size: 150%;
+	font-weight: 500;
+	color: blue;
+}
 .main {
 }
 '

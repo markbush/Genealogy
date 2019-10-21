@@ -27,7 +27,7 @@ FamilyTreePersonCompactView >> person: aPerson [
 
 { #category : #rendering }
 FamilyTreePersonCompactView >> renderCompactPersonOn: html [
-	html tbsRow
+	html span
 		class: 'selectable';
 		onClick: (
 			((html jQuery id: #main) load)
@@ -37,11 +37,8 @@ FamilyTreePersonCompactView >> renderCompactPersonOn: html [
 				]
 		);
 		with: [
-			html tbsColumn
-				with: [
-					html text: self person fullName.
-					self renderDatesForPersonOn: html
-				]
+			html text: self person fullName.
+			self renderDatesForPersonOn: html
 		]
 ]
 
