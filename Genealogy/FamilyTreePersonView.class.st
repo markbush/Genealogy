@@ -36,27 +36,6 @@ FamilyTreePersonView >> person: aPerson [
 ]
 
 { #category : #rendering }
-FamilyTreePersonView >> renderCompactPerson: aPerson on: html [
-	html tbsRow
-		class: 'selectable';
-		onClick: (
-			((html jQuery id: #main) load)
-				html: [ :ajaxHtml |
-					self parentView selectedPerson: aPerson.
-					self parentView renderPersonOn: ajaxHtml
-				]
-		);
-		with: [
-			html tbsColumn
-				mediumOffset: 1;
-				with: [
-					html text: aPerson fullName.
-					self renderDatesForPerson: aPerson on: html
-				]
-		]
-]
-
-{ #category : #rendering }
 FamilyTreePersonView >> renderContentOn: html [
 	self person
 		ifNil: [ html text: 'no entry selected' ]
@@ -144,7 +123,7 @@ FamilyTreePersonView >> renderGenderFormOn: html [
 FamilyTreePersonView >> renderGrandParentsOn: html [
 	html heading level: 3; with: 'Grandparents'.
 	self person grandParents do: [ :grandParent |
-		self renderCompactPerson: grandParent on: html
+		html render: (FamilyTreePersonCompactView on: grandParent for: self parentView)
 	]
 ]
 
@@ -167,7 +146,7 @@ FamilyTreePersonView >> renderMainInfoOn: html [
 FamilyTreePersonView >> renderParentsOn: html [
 	html heading level: 3; with: 'Parents'.
 	self person parents do: [ :parent |
-		self renderCompactPerson: parent on: html
+		html render: (FamilyTreePersonCompactView on: parent for: self parentView)
 	]
 ]
 
@@ -339,7 +318,9 @@ FamilyTreePersonView >> renderRelationship: aFamily on: html [
 	aFamily events do: [ :e | self renderRelationshipEvent: e on: html ].
 	aFamily children ifEmpty: [ ^ self ].
 	html heading level: 5; with: 'Children'.
-	aFamily children do: [ :child | self renderCompactPerson: child on: html ]
+	aFamily children do: [ :child |
+		html render: (FamilyTreePersonCompactView on: child for: self parentView)
+	]
 ]
 
 { #category : #rendering }
@@ -357,6 +338,7 @@ FamilyTreePersonView >> renderRelationshipEvent: anEvent on: html [
 FamilyTreePersonView >> renderRelationshipsOn: html [
 	html heading level: 3; with: 'Relationships'.
 	self person relationships do: [ :family |
+		html render: (FamilyTreeRelationshipView on: family for: self parentView).
 		self renderRelationship: family on: html
 	]
 ]
@@ -365,7 +347,8 @@ FamilyTreePersonView >> renderRelationshipsOn: html [
 FamilyTreePersonView >> renderSiblingsOn: html [
 	html heading level: 3; with: 'Siblings'.
 	self person siblings do: [ :sibling |
-		self renderCompactPerson: sibling on: html
+		html render: (FamilyTreePersonCompactView on: sibling for: self parentView)
+		"self renderCompactPerson: sibling on: html"
 	]
 ]
 

@@ -234,7 +234,7 @@ FamilyTree >> renderLoggedInSidebarOn: html [
 		mediumSize: 3;
 		with: [
 			people do: [ :person |
-				html render: (FamilyTreeCompactPersonView on: person for: self)
+				html render: (FamilyTreePersonListItemView on: person for: self)
 			]
 		]
 ]

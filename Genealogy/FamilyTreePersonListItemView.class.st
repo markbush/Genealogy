@@ -1,8 +1,8 @@
 "
-I represent a compact view of a person.
+I represent a view of a person for selectable lists.
 "
 Class {
-	#name : #FamilyTreeCompactPersonView,
+	#name : #FamilyTreePersonListItemView,
 	#superclass : #FamilyTreeView,
 	#instVars : [
 		'person',
@@ -12,22 +12,22 @@ Class {
 }
 
 { #category : #'instance creation' }
-FamilyTreeCompactPersonView class >> on: aPerson for: aView [
+FamilyTreePersonListItemView class >> on: aPerson for: aView [
 	^ self new person: aPerson; parentView: aView
 ]
 
 { #category : #accessing }
-FamilyTreeCompactPersonView >> person [
+FamilyTreePersonListItemView >> person [
 	^ person
 ]
 
 { #category : #accessing }
-FamilyTreeCompactPersonView >> person: aPerson [
+FamilyTreePersonListItemView >> person: aPerson [
 	person := aPerson
 ]
 
 { #category : #rendering }
-FamilyTreeCompactPersonView >> renderBirthOn: html [
+FamilyTreePersonListItemView >> renderBirthOn: html [
 	html tbsRow
 		class: 'person-birth';
 		with: [
@@ -46,7 +46,7 @@ FamilyTreeCompactPersonView >> renderBirthOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreeCompactPersonView >> renderContentOn: html [
+FamilyTreePersonListItemView >> renderContentOn: html [
 	self viewId: html nextId.
 	html div
 		id: self viewId;
@@ -56,13 +56,13 @@ FamilyTreeCompactPersonView >> renderContentOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreeCompactPersonView >> renderDatesOn: html [
+FamilyTreePersonListItemView >> renderDatesOn: html [
 	self renderBirthOn: html.
 	self renderDeathOn: html
 ]
 
 { #category : #rendering }
-FamilyTreeCompactPersonView >> renderDeathOn: html [
+FamilyTreePersonListItemView >> renderDeathOn: html [
 	html tbsRow
 		class: 'person-death';
 		with: [
@@ -81,7 +81,7 @@ FamilyTreeCompactPersonView >> renderDeathOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreeCompactPersonView >> renderNameOn: html [
+FamilyTreePersonListItemView >> renderNameOn: html [
 	html tbsRow
 		class: 'person-name';
 		with: [
@@ -93,7 +93,7 @@ FamilyTreeCompactPersonView >> renderNameOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreeCompactPersonView >> renderPersonOn: html [
+FamilyTreePersonListItemView >> renderPersonOn: html [
 	html div
 		class: 'person-compact selectable';
 		onClick: (
@@ -111,11 +111,11 @@ FamilyTreeCompactPersonView >> renderPersonOn: html [
 ]
 
 { #category : #accessing }
-FamilyTreeCompactPersonView >> viewId [
+FamilyTreePersonListItemView >> viewId [
 	^ viewId
 ]
 
 { #category : #accessing }
-FamilyTreeCompactPersonView >> viewId: anId [
+FamilyTreePersonListItemView >> viewId: anId [
 	viewId := anId
 ]
