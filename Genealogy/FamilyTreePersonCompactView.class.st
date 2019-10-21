@@ -38,7 +38,6 @@ FamilyTreePersonCompactView >> renderCompactPersonOn: html [
 		);
 		with: [
 			html tbsColumn
-				mediumOffset: 1;
 				with: [
 					html text: self person fullName.
 					self renderDatesForPersonOn: html

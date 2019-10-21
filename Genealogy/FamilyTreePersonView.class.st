@@ -36,6 +36,13 @@ FamilyTreePersonView >> person: aPerson [
 ]
 
 { #category : #rendering }
+FamilyTreePersonView >> renderCompactPerson: aPerson on: html offset: anOffset [
+	html tbsColumn
+		mediumOffset: anOffset;
+		with: (FamilyTreePersonCompactView on: aPerson for: self parentView)
+]
+
+{ #category : #rendering }
 FamilyTreePersonView >> renderContentOn: html [
 	self person
 		ifNil: [ html text: 'no entry selected' ]
@@ -123,7 +130,7 @@ FamilyTreePersonView >> renderGenderFormOn: html [
 FamilyTreePersonView >> renderGrandParentsOn: html [
 	html heading level: 3; with: 'Grandparents'.
 	self person grandParents do: [ :grandParent |
-		html render: (FamilyTreePersonCompactView on: grandParent for: self parentView)
+		self renderCompactPerson: grandParent on: html offset: 1
 	]
 ]
 
@@ -146,7 +153,7 @@ FamilyTreePersonView >> renderMainInfoOn: html [
 FamilyTreePersonView >> renderParentsOn: html [
 	html heading level: 3; with: 'Parents'.
 	self person parents do: [ :parent |
-		html render: (FamilyTreePersonCompactView on: parent for: self parentView)
+		self renderCompactPerson: parent on: html offset: 1
 	]
 ]
 
@@ -314,12 +321,14 @@ FamilyTreePersonView >> renderPersonSurnameOn: html [
 
 { #category : #rendering }
 FamilyTreePersonView >> renderRelationship: aFamily on: html [
-	aFamily partners do: [ :partner | self renderPartner: partner on: html ] without: self person.
+	aFamily partners do: [ :partner |
+		self renderCompactPerson: partner on: html offset: 0
+	] without: self person.
 	aFamily events do: [ :e | self renderRelationshipEvent: e on: html ].
 	aFamily children ifEmpty: [ ^ self ].
 	html heading level: 5; with: 'Children'.
 	aFamily children do: [ :child |
-		html render: (FamilyTreePersonCompactView on: child for: self parentView)
+		self renderCompactPerson: child on: html offset: 1
 	]
 ]
 
@@ -347,8 +356,7 @@ FamilyTreePersonView >> renderRelationshipsOn: html [
 FamilyTreePersonView >> renderSiblingsOn: html [
 	html heading level: 3; with: 'Siblings'.
 	self person siblings do: [ :sibling |
-		html render: (FamilyTreePersonCompactView on: sibling for: self parentView)
-		"self renderCompactPerson: sibling on: html"
+		self renderCompactPerson: sibling on: html offset: 1
 	]
 ]
 
