@@ -3,9 +3,8 @@ I represent a compact view of a person.
 "
 Class {
 	#name : #FamilyTreeCompactPersonView,
-	#superclass : #WAComponent,
+	#superclass : #FamilyTreeView,
 	#instVars : [
-		'parentView',
 		'person',
 		'viewId'
 	],
@@ -15,16 +14,6 @@ Class {
 { #category : #'instance creation' }
 FamilyTreeCompactPersonView class >> on: aPerson for: aView [
 	^ self new person: aPerson; parentView: aView
-]
-
-{ #category : #accessing }
-FamilyTreeCompactPersonView >> parentView [
-	^ parentView
-]
-
-{ #category : #accessing }
-FamilyTreeCompactPersonView >> parentView: aView [
-	parentView := aView
 ]
 
 { #category : #accessing }

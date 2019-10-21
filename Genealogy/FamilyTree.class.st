@@ -3,10 +3,9 @@ I am a family tree application.
 "
 Class {
 	#name : #FamilyTree,
-	#superclass : #WAComponent,
+	#superclass : #FamilyTreeView,
 	#instVars : [
 		'selectedPerson',
-		'selectedView',
 		'searchText'
 	],
 	#classInstVars : [
@@ -311,16 +310,6 @@ FamilyTree >> selectedPerson [
 { #category : #accessing }
 FamilyTree >> selectedPerson: aPerson [
 	selectedPerson := aPerson
-]
-
-{ #category : #accessing }
-FamilyTree >> selectedView [
-	^ selectedView
-]
-
-{ #category : #accessing }
-FamilyTree >> selectedView: aView [
-	selectedView := aView
 ]
 
 { #category : #hooks }

@@ -3,13 +3,9 @@ I represent a full view of a person.
 "
 Class {
 	#name : #FamilyTreePersonView,
-	#superclass : #WAComponent,
+	#superclass : #FamilyTreeView,
 	#instVars : [
-		'selectedView',
-		'parentView',
-		'person',
-		'editField',
-		'editValue'
+		'person'
 	],
 	#category : #Genealogy
 }
@@ -27,36 +23,6 @@ FamilyTreePersonView class >> on: aPerson for: aView selectedView: aSelectedView
 { #category : #defaults }
 FamilyTreePersonView class >> valueForGender: aGender [
 	^ self defaultGenders indexOf: aGender
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> editField [
-	^ editField
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> editField: aPersonField [
-	editField := aPersonField
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> editValue [
-	^ editValue
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> editValue: aString [
-	editValue := aString
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> parentView [
-	^ parentView
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> parentView: aView [
-	parentView := aView
 ]
 
 { #category : #accessing }
@@ -500,48 +466,6 @@ FamilyTreePersonView >> renderTextEditorOn: html [
 			]
 		]
 	]
-]
-
-{ #category : #rendering }
-FamilyTreePersonView >> renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock [
-	self renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock icon: #iconEdit
-]
-
-{ #category : #rendering }
-FamilyTreePersonView >> renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock icon: anIconSelector [
-	html anchor
-		url: aModalSymbol printString;
-		attributeAt: 'data-toggle' put: 'modal';
-		onClick: (
-			(html jQuery id: titleId) load
-				html: [ :ajaxHtml |
-					self editField: aSelector.
-					ajaxHtml text: title
-				]
-		);
-		onClick: (
-			(html jQuery id: inputId) value: aBlock value
-		);
-		onClick: (
-			(html jQuery id: aModalSymbol)
-				toggle
-		);
-		with: [
-			html span: [
-				html tbsGlyphIcon perform: anIconSelector
-			]
-		].
-	html space
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> selectedView [
-	^ selectedView
-]
-
-{ #category : #accessing }
-FamilyTreePersonView >> selectedView: aView [
-	selectedView := aView
 ]
 
 { #category : #updating }
