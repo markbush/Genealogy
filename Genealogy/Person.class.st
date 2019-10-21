@@ -50,19 +50,32 @@ Person class >> atId: anId add: aPerson [
 
 { #category : #'instance creation' }
 Person class >> fromArray: anArray [
-	| id person family birthDate birthPlace deathDate deathPlace |
+	| id person forenames family birthDate birthPlace deathDate deathPlace |
 	id := anArray at: 1.
 	person := self atId: id.
 	person ifNotNil: [ ^ person ].
 	person := self new.
 	person gender: (anArray at: 3).
-	person forenames: (anArray at: 4).
+	forenames := (anArray at: 4).
+	(forenames isNotNil and: [ forenames includes: $( ])
+		ifFalse: [ person forenames: forenames ]
+		ifTrue: [ | nicknameMatcher |
+			nicknameMatcher := '(.*) \((.*)\)' asRegex.
+			(nicknameMatcher matches: forenames)
+				ifFalse: [ person forenames: forenames ]
+				ifTrue: [
+					person forenames: (nicknameMatcher subexpression: 2).
+					person nickname: (nicknameMatcher subexpression: 3)
+				]
+		].
 	person surname: (anArray at: 5).
 	birthDate := anArray at: 6.
+	birthDate ifNotNil: [ birthDate := EventDate fromString: birthDate ].
 	birthPlace := anArray at: 7.
 	(birthDate isNotNil or: [ birthPlace isNotNil ])
 		ifTrue: [ person birth: (Event forType: 'birth' on: birthDate at: birthPlace) ].
 	deathDate := anArray at: 8.
+	deathDate ifNotNil: [ deathDate := EventDate fromString: deathDate ].
 	deathPlace := anArray at: 9.
 	(deathDate isNotNil or: [ deathPlace isNotNil ])
 		ifTrue: [ person death: (Event forType: 'death' on: deathDate at: deathPlace) ].
@@ -79,6 +92,37 @@ Person class >> fromArray: anArray [
 Person class >> initialize [
 	"self initialize"
 	People := Dictionary new
+]
+
+{ #category : #data }
+Person class >> resetDataFrom: aFilename [
+	| fileStream csv |
+	"self resetDataFrom: '/Users/bush/Downloads/family-data.csv'"
+	self initialize.
+	Family initialize.
+	fileStream := aFilename asFileReference readStream.
+	csv := NeoCSVReader on: fileStream.
+	csv do: [ :record | | person1 person2 family |
+		person1 := nil.
+		person2 := nil.
+		(record at: 1) ifNotNil: [
+			person1 := self fromArray: (record copyFrom: 1 to: 9)
+		].
+		(record at: 12) ifNotNil: [
+			person2 := self fromArray: (record copyFrom: 12 to: 20)
+		].
+		(record at: 10) ifNotNil: [
+			family := Family fromArray: (record copyFrom: 10 to: 11).
+			person1 addRelationship: family.
+			person2 ifNotNil: [ person2 addRelationship: family ].
+			family addPartner: person1.
+			family addPartner: person2
+		]
+	].
+	Transcript
+		show: 'Loaded:'; cr;
+		show: self allPeople size; show: ' people'; cr;
+		show: Family allFamilies size; show: ' families'; cr
 ]
 
 { #category : #operations }

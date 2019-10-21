@@ -46,6 +46,7 @@ Family class >> fromArray: anArray [
 	family := self new.
 	marriageDate := anArray at: 2.
 	marriageDate ifNotNil: [
+		marriageDate := EventDate fromString: marriageDate.
 		family addEvent: (Event forType: 'marriage' on: marriageDate at: nil)
 	].
 	self atId: familyId add: family.
