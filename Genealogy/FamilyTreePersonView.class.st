@@ -36,13 +36,6 @@ FamilyTreePersonView >> person: aPerson [
 ]
 
 { #category : #rendering }
-FamilyTreePersonView >> renderCompactPerson: aPerson on: html offset: anOffset [
-	html tbsColumn
-		mediumOffset: anOffset;
-		with: (FamilyTreePersonCompactView on: aPerson for: self parentView)
-]
-
-{ #category : #rendering }
 FamilyTreePersonView >> renderContentOn: html [
 	self person
 		ifNil: [ html text: 'no entry selected' ]
@@ -305,39 +298,10 @@ FamilyTreePersonView >> renderPersonSurnameOn: html [
 ]
 
 { #category : #rendering }
-FamilyTreePersonView >> renderRelationship: aFamily on: html [
-	aFamily partners do: [ :partner |
-		html div
-			class: 'person-partner';
-			with: [
-				self renderCompactPerson: partner on: html offset: 0
-			]
-	] without: self person.
-	aFamily events do: [ :e | self renderRelationshipEvent: e on: html ].
-	aFamily children ifEmpty: [ ^ self ].
-	html heading level: 5; with: 'Children'.
-	aFamily children do: [ :child |
-		self renderCompactPerson: child on: html offset: 1
-	]
-]
-
-{ #category : #rendering }
-FamilyTreePersonView >> renderRelationshipEvent: anEvent on: html [
-	^ html heading
-		level: 4;
-		with: [
-			html text: anEvent type.
-			html space.
-			html text: anEvent dateAndLocationString
-		]
-]
-
-{ #category : #rendering }
 FamilyTreePersonView >> renderRelationshipsOn: html [
 	html heading level: 3; with: 'Relationships'.
 	self person relationships do: [ :family |
-		html render: (FamilyTreeRelationshipView on: family for: self parentView).
-		self renderRelationship: family on: html
+		html render: (FamilyTreeRelationshipView on: family for: self parentView)
 	]
 ]
 

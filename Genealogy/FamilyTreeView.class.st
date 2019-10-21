@@ -46,6 +46,13 @@ FamilyTreeView >> parentView: aView [
 ]
 
 { #category : #rendering }
+FamilyTreeView >> renderCompactPerson: aPerson on: html offset: anOffset [
+	html tbsColumn
+		mediumOffset: anOffset;
+		with: (FamilyTreePersonCompactView on: aPerson for: self parentView)
+]
+
+{ #category : #rendering }
 FamilyTreeView >> renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock [
 	self renderTo: html linkForModal: aModalSymbol titleId: titleId title: title fieldSelector: aSelector inputId: inputId valueBlock: aBlock icon: #iconEdit
 ]
